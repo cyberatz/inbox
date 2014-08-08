@@ -123,3 +123,8 @@ class Part(MailSyncBase):
     def is_embedded(self):
         return (self.content_disposition is not None and
                 self.content_disposition.lower() == 'inline')
+
+    def should_create_revision(self):
+        """Don't create revisions for parts that aren't actually attachments,
+        since we don't expose those through the API."""
+        return self.is_attachment

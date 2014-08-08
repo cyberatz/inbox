@@ -78,7 +78,7 @@ from inbox.basicauth import AuthError
 from inbox.log import get_logger
 log = get_logger()
 from inbox.crispin import connection_pool, retry_crispin
-from inbox.models import Folder
+from inbox.models import Folder, Namespace
 from inbox.models.backends.imap import ImapFolderSyncStatus, ImapThread
 from inbox.mailsync.exc import UidInvalid
 from inbox.mailsync.backends.imap import common
@@ -154,6 +154,12 @@ class FolderSyncEngine(Greenlet):
         self.retry_fail_classes = retry_fail_classes
         self.state = None
         self.conn_pool = _pool(self.account_id)
+
+        # Bind the applicable namespace to the FolderSyncEngine instance.
+        with mailsync_session_scope() as db_session:
+            self.namespace = db_session.query(Namespace). \
+                filter(Namespace.account_id == self.account_id).one()
+            db_session.expunge(self.namespace)
 
         self.state_handlers = {
             'initial': self.initial_sync,
@@ -375,7 +381,7 @@ class FolderSyncEngine(Greenlet):
         if not raw_messages:
             return 0
         with self.syncmanager_lock:
-            with mailsync_session_scope() as db_session:
+            with mailsync_session_scope(namespace=self.namespace) as db_session:
                 new_imapuids = create_db_objects(
                     self.account_id, db_session, log, folder_name,
                     raw_messages, self.create_message)
