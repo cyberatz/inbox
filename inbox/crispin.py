@@ -73,7 +73,7 @@ def _get_connection_pool(account_id, pool_size, pool_map, readonly):
             raise GreenletExit()
 
 
-def connection_pool(account_id, pool_size=4, pool_map=dict()):
+def connection_pool(account_id, pool_size=5, pool_map=dict()):
     """ Per-account crispin connection pool.
 
     Use like this:
