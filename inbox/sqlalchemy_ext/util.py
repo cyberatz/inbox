@@ -21,6 +21,7 @@ log = get_logger()
 
 
 SLOW_QUERY_THRESHOLD_MS = 5000
+MAX_TEXT_LENGTH = 65535
 
 
 @event.listens_for(Engine, "before_cursor_execute")
@@ -60,6 +61,24 @@ class JSON(TypeDecorator):
         if not value:
             return None
         return json_util.loads(value)
+
+
+def truncate_json_list(value):
+    """Checks whether a list fits in a column of type JSON. If not, shortens
+    it until it does.
+    Returns
+    -------
+    tuple (list, bool) of the possibly truncated list, and whether it was
+    truncated or not.
+    """
+    assert isinstance(value, list)
+    if len(json_util.dumps(value)) <= MAX_TEXT_LENGTH:
+        return (value, False)
+
+    # Truncate list element-by-element until it fits.
+    while len(json_util.dumps(value)) > MAX_TEXT_LENGTH:
+        value = value[:-1]
+    return (value, True)
 
 
 class LittleJSON(JSON):
