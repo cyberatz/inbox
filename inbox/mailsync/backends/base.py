@@ -13,6 +13,8 @@ from inbox.models.session import session_scope
 from inbox.mailsync.exc import SyncException
 
 
+# We do NOT ignore soft deletes in the mail sync because it gets real
+# complicated handling e.g. when backends reuse imapids.
 mailsync_session_scope = functools.partial(session_scope,
                                            ignore_soft_deletes=False)
 

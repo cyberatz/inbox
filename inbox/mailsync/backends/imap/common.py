@@ -22,12 +22,6 @@ from inbox.log import get_logger
 log = get_logger()
 
 
-def all_uids(account_id, session, folder_name):
-    return {uid for uid, in session.query(ImapUid.msg_uid).join(Folder).filter(
-        ImapUid.account_id == account_id,
-        Folder.name == folder_name)}
-
-
 def update_thread_labels(thread, folder_name, g_labels, db_session):
     """ Make sure `thread` has all the right labels. """
     existing_labels = {folder.name.lower() for folder in thread.folders
