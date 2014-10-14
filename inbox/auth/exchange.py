@@ -12,6 +12,6 @@ from inbox.auth.oauth import verify_account as oauth_verify_account
 from inbox.oauth import oauth_authorize_console
 from inbox.models import Namespace
 from inbox.config import config
-from inbox.models.backends.outlook import OutlookAccount
+from inbox.models.backends.exchange import ExchangeAccount
 
 PROVIDER = 'exchange'
