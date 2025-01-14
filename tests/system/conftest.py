@@ -23,7 +23,7 @@ try:
     all_accounts = [InboxTestClient(email) for email, _ in credentials]
     gmail_accounts = [InboxTestClient(email)
                       for email, password in credentials
-                          if "gmail.com" in email]
+                          if email.split('@')[-1] == "gmail.com"]
 except ImportError:
     print ("Error: test accounts file not found. "
            "You need to create accounts.py\n"
